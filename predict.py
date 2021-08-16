@@ -23,9 +23,10 @@ from model import model_
 from preprocess import *
 from training import *
 
+with open(os.path.join(DATA_PATH,padded_seqfile),"rb") as file:
+  maxlen=pickle.load(file).shape[1]
 
-
-def seq_gen(testsample,maxlen=223)  :
+def seq_gen(testsample,maxlen=maxlen)  :
   df=pd.DataFrame([testsample],columns=["review"])
   df["review"]=df["review"].apply(lambda x:x.strip("READ MORE").lower())
   df["review"]=df["review"].apply(convert_emojis)
@@ -46,8 +47,8 @@ def seq_gen(testsample,maxlen=223)  :
                                                          padding='post')
   return seq_texts
 
-def topicpredict(testsample,weight_path,model_,MODEL_CONFIG,maxlen=223):
-  k=tf.random.uniform(shape=[100,223],minval=1,maxval=38,dtype=tf.int32),tf.random.uniform(shape=[100,20,223],minval=1,maxval=38,dtype=tf.int32)
+def topicpredict(testsample,weight_path,model_,MODEL_CONFIG):
+  k=tf.random.uniform(shape=[embed_outputdim,maxlen],minval=1,maxval=38,dtype=tf.int32),tf.random.uniform(shape=[embed_outputdim,negative_samples,maxlen],minval=1,maxval=38,dtype=tf.int32)
   inf=model_.from_config(MODEL_CONFIG)
   inf(k)
   inf.load_weights(weight_path)
