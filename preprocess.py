@@ -1,5 +1,6 @@
 import emot
 import os
+import io
 import matplotlib.pyplot as plt
 import pandas as pd
 from gensim.models import FastText 
@@ -13,7 +14,6 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 # Downloading the corresponding packages
 import pickle
 import nltk
-nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 from nltk.corpus import stopwords
 import numpy as np
@@ -110,7 +110,7 @@ def tokenisation_on_traindata(return_tkn=True):
     train=text_processing(stopword=stopword,min_word_repeat=10,sent_len_percentile=99.9,dump_aspickle=True,return_df=True)
   tkn = Tokenizer(filters='!"#$%&()*+,-./:;=?@[\\]^_`{|}~\t\n') #tensorflow tokenising
   tkn.fit_on_texts(train['review'].values)
-  with open(os.path.join(DATA_PATH,"token.pickle"),"wb") as file:
+  with io.open(os.path.join(DATA_PATH,"token.pickle"),"wb") as file:
     pickle.dump(tkn,file)
   if return_tkn:
     return tkn
@@ -191,6 +191,8 @@ def textinputsequence_padding(padding="post",padded_seqagain=train_again,return_
                                                          padding=padding)
     with open(os.path.join(DATA_PATH,"padded_sequences.pickle"),"wb") as file:
       pickle.dump(seq_texts,file)
+    with open(os.path.join(DATA_PATH,"maxlen.pickle"),"wb") as file:
+      pickle.dump(seq_texts.shape[1],file)
 
   if return_paddedsequences:
     return seq_texts
@@ -198,7 +200,7 @@ def textinputsequence_padding(padding="post",padded_seqagain=train_again,return_
 
 def generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samples=negative_samples):
   if  os.path.isfile(os.path.join(DATA_PATH,padded_seqfile)):
-    with open(os.path.join(DATA_PATH,"padded_sequences.pickle"),"rb") as file:
+    with io.open(os.path.join(DATA_PATH,"padded_sequences.pickle"),"rb") as file:
       seq_texts=pickle.load(file)
   else:
     seq_texts=textinputsequence_padding(padding="post",padded_seqagain=train_again,return_paddedsequences=True)
@@ -218,3 +220,9 @@ def generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samp
   dataset=tf.data.Dataset.from_generator(gendata, output_types=(tf.int32,tf.int32))
   dataset=dataset.repeat(1).shuffle(buffer_size=buffer_size).batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
   return dataset
+
+if __name__=="__main__":
+  dataset=generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samples=negative_samples)
+  tf.data.experimental.save(
+    dataset, path="/content/drive/My Drive/REVIEWSV2/", compression=None, shard_func=None)
+

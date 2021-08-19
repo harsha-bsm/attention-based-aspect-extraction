@@ -1,6 +1,4 @@
-import emot
 import os
-import matplotlib.pyplot as plt
 import pandas as pd
 from gensim.models import FastText 
 import re
@@ -21,8 +19,6 @@ from random import randint
 from sklearn.cluster import KMeans
 from config import *
 from preprocess import *
-
-
 
 def embedding_layerinit():
   model=training_vocab(embed_dim=embed_outputdim,negative_sampling=5,min_count=1,window=10,iter=250,sg=1,train_again=vocabtrain_again,return_model=True)
@@ -64,6 +60,9 @@ class Attention(tf.keras.layers.Layer):
                                                     # f - softmax - gives info about unimportant words in the sentence for extracting aspects 
       
       return zs,f
+    @classmethod
+    def from_config(cls, config):
+      return cls(**config)
 
 
 # custom model
@@ -80,7 +79,7 @@ class model_(tf.keras.Model):
     self.attention=Attention()
     self.aspects_k=aspects_k #number of aspects
     self.init=aspectlayer_weightinit()
-    self.k = tf.keras.layers.Dense(aspects_k,name="dim_reduction_layer",activation="softmax")
+    self.k = tf.keras.layers.Dense(aspects_k,name="dim_reduction_layer",activation="sigmoid")
     self.dense= self.trained_weights.shape[1]
     self.final=tf.keras.layers.Dense(self.dense,name="final_dense",kernel_initializer=self.init) #weights are initialised with embedding clusters
   def call(self,input):
@@ -99,7 +98,7 @@ class model_(tf.keras.Model):
     f=tf.tensordot(rs,zs,[[0,1],[0,1]])
     a=self.embedding(input[1])
     a=tf.reduce_mean(a,axis=-2)
-    loss=tf.reduce_sum(tf.nn.relu(1-tf.reduce_sum(tf.tensordot(a,r,[[0,2],[0,2]]))+f))+1*reg #this is the loss which is to be minimised
+    loss=tf.reduce_sum(tf.nn.relu(1-tf.reduce_sum(tf.tensordot(a,r,[[0,2],[0,2]]))+f))+lamda*reg #this is the loss which is to be minimised
     return loss,pt,rs 
     
     

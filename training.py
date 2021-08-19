@@ -9,9 +9,9 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense,Concatenate,TimeDistr
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
 import pickle
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 import numpy as np
 from gensim.models import FastText 
@@ -21,7 +21,6 @@ from sklearn.cluster import KMeans
 from config import *
 from model import model_
 from config import *
-from model import model_
 from preprocess import *
 
 
@@ -37,7 +36,7 @@ def training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=itera
       return loss, gradients
   train_loss = tf.keras.metrics.Mean(name='train_loss')
 
-
+  
 ##check point to save
   ckpt = tf.train.Checkpoint(optimizer=optimizer, model=abae)
   ckpt_manager = tf.train.CheckpointManager(ckpt, CHECKPOINTS_PATH, max_to_keep=3)
@@ -45,7 +44,7 @@ def training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=itera
   weights_pathlist=[]
   for k in range(0,iterations): # k - number of iterations
     counter = 0
-
+  
   # navigating through each batch
     for input in dataset:
       loss_, gradients = train_step(input)
@@ -70,6 +69,11 @@ def training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=itera
   if return_bestweightspath:
     argminimum=np.argmin(loss_list)
     return weights_pathlist[argminimum]  
+
+
+if __name__=="__main__":
+  dataset=generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samples=negative_samples)
+  weight_path=training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=iterations,return_bestweightspath=return_bestweightspath)
 
 
 

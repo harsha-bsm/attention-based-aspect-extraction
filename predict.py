@@ -9,9 +9,11 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense,Concatenate,TimeDistr
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-
+# Using NLTK for PoS tagging and Stopwords removal
+# Downloading the corresponding packages
 import pickle
 import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 import numpy as np
 from gensim.models import FastText 
@@ -23,10 +25,11 @@ from model import model_
 from preprocess import *
 from training import *
 
-with open(os.path.join(DATA_PATH,padded_seqfile),"rb") as file:
-  maxlen=pickle.load(file).shape[1]
 
-def seq_gen(testsample,maxlen=maxlen)  :
+
+with io.open(os.path.join(DATA_PATH,maxlen),"rb") as file:
+  maxlen=pickle.load(file)
+def topicpredict(testsample):  
   df=pd.DataFrame([testsample],columns=["review"])
   df["review"]=df["review"].apply(lambda x:x.strip("READ MORE").lower())
   df["review"]=df["review"].apply(convert_emojis)
@@ -45,25 +48,23 @@ def seq_gen(testsample,maxlen=maxlen)  :
   seq_texts=tf.keras.preprocessing.sequence.pad_sequences(seq_texts,
                                                          maxlen=maxlen,
                                                          padding='post')
-  return seq_texts
 
-def topicpredict(testsample,weight_path,model_,MODEL_CONFIG):
-  k=tf.random.uniform(shape=[embed_outputdim,maxlen],minval=1,maxval=38,dtype=tf.int32),tf.random.uniform(shape=[embed_outputdim,negative_samples,maxlen],minval=1,maxval=38,dtype=tf.int32)
+
+  k=tf.random.uniform(shape=[100,223],minval=1,maxval=38,dtype=tf.int32),tf.random.uniform(shape=[100,20,223],minval=1,maxval=38,dtype=tf.int32)
   inf=model_.from_config(MODEL_CONFIG)
   inf(k)
   inf.load_weights(weight_path)
   l=inf.layers
-  seq_text=seq_gen(testsample,maxlen=maxlen)
-  sample=seq_text.reshape(1,maxlen)
+  sample=seq_texts.reshape(1,maxlen)
   endsample=l[0](sample)
   mask=l[0].compute_mask(sample)
   att=l[1](endsample,mask)[0]  
-  topic_num=np.argmax(l[2](att))+1
-  
-  return 
-
+  boole=(np.sort(l[2](att)[0].numpy())[::-1]>0.5)*1
+  final=list((np.argsort(l[2](att)[0].numpy())[::-1]+1)*boole)
+  final=[x for x in final if x!=0]
+  return "belongs to topics in descending order_"+str(final),l[2](att)[0].numpy()
 
 if __name__=="__main__":
   testsample=input()
-  print(topicpredict(testsample,WEIGHTS_PATH,model_,MODEL_CONFIG,maxlen=223))
-  
+  print(topicpredict(testsample))
+
