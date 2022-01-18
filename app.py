@@ -2,6 +2,7 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from predict import *
+import pandas
 
 
 app = Flask(__name__)
