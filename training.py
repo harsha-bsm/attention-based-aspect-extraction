@@ -57,6 +57,8 @@ def training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=itera
 
     loss_list.append(train_loss.result()) #appending loss after every epoch
     ckpt_save_path  = ckpt_manager.save() #checkpointing after every epoch
+    if os.path.isdir(WEIGHTS_PATH)==False:
+      os.makedirs(WEIGHTS_PATH)
     X=os.path.join(WEIGHTS_PATH,"weights_epoch_"+str(k+1))
     abae.save_weights(X,save_format="h5")
 
