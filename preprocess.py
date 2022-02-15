@@ -6,6 +6,7 @@ import pandas as pd
 from gensim.models import FastText 
 import re
 import tensorflow as tf
+print("tensorflow_imported")
 from tensorflow.keras.layers import Embedding, LSTM, Dense,Concatenate,TimeDistributed,Masking,GRU,Input,Dot,Reshape,Softmax
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -223,6 +224,7 @@ def generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samp
 
 if __name__=="__main__":
   dataset=generate_dataset(buffer_size=buffer_size,batch_size=batch_size,negative_samples=negative_samples)
+  
   tf.data.experimental.save(
-    dataset, path="/content/drive/My Drive/REVIEWSV2/", compression=None, shard_func=None)
-
+    dataset, path="C:/Users/sai.m.bayyavarapu/Documents/attention-based-aspect-extraction/Data/ReviewsV2", compression=None, shard_func=None)
+  
