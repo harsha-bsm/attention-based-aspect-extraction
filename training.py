@@ -54,7 +54,7 @@ def training(WEIGHTS_PATH,CHECKPOINTS_PATH,dataset,model_,lr=lr,iterations=itera
       template = '''Done {} step, Loss: {:0.6f}'''
       if counter%500==0:
         print(template.format(counter, train_loss.result()))
-
+#
     loss_list.append(train_loss.result()) #appending loss after every epoch
     ckpt_save_path  = ckpt_manager.save() #checkpointing after every epoch
     if os.path.isdir(WEIGHTS_PATH)==False:

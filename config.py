@@ -1,5 +1,5 @@
 from nltk.corpus import stopwords
-DATA_PATH="/content/drive/My Drive/REVIEWS/"
+DATA_PATH="C:/Users/sai.m.bayyavarapu/Documents/attention-based-aspect-extraction/Data/"
 raw_file="reviews.pickle"
 preprocessed_file="preprocessed_df.pickle"
 trained_embeddings="trained_embeddings"
@@ -13,12 +13,13 @@ aspects_k=10 #number of aspects
 buffer_size=1024
 batch_size=100
 negative_samples=20
-WEIGHTS_PATH="/content/drive/My Drive/abae_logs/checkpoints/abae/trainfrom/WeightsV5"
+#WEIGHTS_PATH="/content/drive/My Drive/abae_logs/checkpoints/abae/trainfrom/WeightsV5"
 #WEIGHTS_PATH="/content/drive/My Drive/REVIEWS/WEIGHTS_NOUNS"
-weight_path="/content/drive/My Drive/abae_logs/checkpoints/abae/trainfrom/WeightsV5/weights_epoch_15"
-CHECKPOINTS_PATH="/content/drive/My Drive/REVIEWS/checkpointsV5"
+#weight_path="/content/drive/My Drive/abae_logs/checkpoints/abae/trainfrom/WeightsV5/weights_epoch_15"
+CHECKPOINTS_PATH="C:/Users/sai.m.bayyavarapu/Documents/attention-based-aspect-extraction/checkpoints"
+WEIGHTS_PATH="C:/Users/sai.m.bayyavarapu/Documents/attention-based-aspect-extraction/weights"
 lr=0.001
-iterations=15
+iterations=1
 return_bestweightspath=True
 lamda=0.5
 MODEL_CONFIG = {'embed_outputdim': embed_outputdim,
